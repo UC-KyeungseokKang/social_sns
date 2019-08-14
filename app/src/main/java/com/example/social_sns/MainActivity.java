@@ -38,15 +38,16 @@ public class MainActivity extends AppCompatActivity {
 
         lineChart = (LineChart)findViewById(R.id.chart);
 
-        Log.d("findpath_start","");
-        TransportApi transportApi = new TransportApi();
-        transportApi.execute("", "", "");
+        //공공데이터 전기 판매량 api 불러오기
+        PowersellApi powersellApi = new PowersellApi();
+        powersellApi.execute("", "", "");
 
+        //딜레이는 공공데이터 api의 응답속도가 10초~15초 사이이기에 20초의 딜레이를 주고 그래프로 표현
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //임시로 mainactivity로 이동
+
                 entries.add(new Entry(1, 1));
                 LineDataSet lineDataSet = new LineDataSet(entries, "속성명1");
                 lineDataSet.setLineWidth(2);
@@ -80,37 +81,32 @@ public class MainActivity extends AppCompatActivity {
                 lineChart.invalidate();
             }
         }, 20000);
-        /*
-        entries.add(new Entry(1, 1));
-        entries.add(new Entry(2, 2));
-        entries.add(new Entry(3, 0));
-        entries.add(new Entry(4, 4));
-        entries.add(new Entry(5, 3));
-        entries.add(new Entry(6, 32222222));
-*/
 
 
 
     }
 
 
-    public class TransportApi extends AsyncTask<String, String, String> {
+    public class PowersellApi extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... strings) {
             Log.d("findpath_start", "start");
 
 
+            //포털에서 받은 apikey값을 아래에 넣고
             String Apikey = "FQQeXxWRomvFN8FcMh8EBwqytCxDhEDSr5%2BzzwJAMN7s3T0Oi%2F9u4QJV4kmi02BTEhjQ7i6dz7bXaFp7iXuInQ%3D%3D&pageNo=1";
+
+            //요청 파라미터에 값을 넣습니다.
             String startDate="201202";
             String endDate="201205";
 
+            //요청할 url를 만들고
             String requestUrl = "https://www.kdhc.co.kr/openapi-data/service/kdhcPowerSell/powerSell?serviceKey="+Apikey+"&pageNo=1&numOfRows=10&startDate="+startDate+"&endDate="+endDate;
-            //https://www.kdhc.co.kr/openapi-data/service/kdhcPowerSell/powerSell?serviceKey=FQQeXxWRomvFN8FcMh8EBwqytCxDhEDSr5%2BzzwJAMN7s3T0Oi%2F9u4QJV4kmi02BTEhjQ7i6dz7bXaFp7iXuInQ%3D%3D&pageNo=1&numOfRows=10&startDate=201202&endDate=201205
 
             Log.d("findpath_distance",requestUrl);
 
-            //지하철. 버스 환승 경로
+            //try를 통해 요청을 시작합니다.
             try {
                 boolean b_item = false;
                 boolean b_branchId = false;
@@ -204,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
                             if (b_yyyymm) {
                                 temp_yyyymm = parser.getText();
                                 Log.d("temp_yyyymm", temp_yyyymm);
+                                //여기서 그래프에 값을 넣습니다.
                                 entries.add(new Entry(countlist, Float.parseFloat(temp_pwrQty)));
                                 countlist++;
                                 b_yyyymm = false;
@@ -216,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 break;
                             }
-
 
                         case XmlPullParser.END_DOCUMENT:
                             break;
