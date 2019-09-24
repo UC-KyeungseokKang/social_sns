@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,12 +49,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                entries.add(new Entry(1, 1));
+                //entries.add(new Entry(1, 1));
+                for(int i=0;i<24;i++){
+                    //temp_pwrQty=i+0.1;
+                    double random=Math.random()*10;
+                    entries.add(new Entry(i+0.1f, (float) (random+0.1f)));
+
+                }
                 LineDataSet lineDataSet = new LineDataSet(entries, "속성명1");
                 lineDataSet.setLineWidth(2);
                 lineDataSet.setCircleRadius(6);
                 lineDataSet.setCircleColor(Color.parseColor("#FFA1B4DC"));
-                lineDataSet.setCircleColorHole(Color.BLUE);
+                lineDataSet.setCircleColorHole(Color.BLACK);
                 lineDataSet.setColor(Color.parseColor("#FFA1B4DC"));
                 lineDataSet.setDrawCircleHole(true);
                 lineDataSet.setDrawCircles(true);
@@ -65,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 XAxis xAxis = lineChart.getXAxis();
                 xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
                 xAxis.setTextColor(Color.BLACK);
-                xAxis.enableGridDashedLine(8, 24, 0);
+                xAxis.enableGridDashedLine(24, 24, 0);
                 YAxis yLAxis = lineChart.getAxisLeft();
                 yLAxis.setTextColor(Color.BLACK);
                 YAxis yRAxis = lineChart.getAxisRight();
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 lineChart.animateY(2000, Easing.EasingOption.EaseInCubic);
                 lineChart.invalidate();
             }
-        }, 20000);
+        }, 3000);
 
 
 
@@ -134,7 +141,13 @@ public class MainActivity extends AppCompatActivity {
                 int countlist=0;
 
                 int eventType = parser.getEventType();
-
+                for(int i=0;i<24;i++){
+                    //temp_pwrQty=i+0.1;
+                    entries.add(new Entry(i+0.1f, i+0.1f));
+                    countlist++;
+                }
+                entries.add(new Entry(5+0.1f, 5+0.1f));
+                /*
                 while (eventType != XmlPullParser.END_DOCUMENT) {
                     //Log.d("findpath_parser", String.valueOf(eventType)+" name : "+parser.getName()+" text : "+parser.getText());
                     switch (eventType) {
@@ -221,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     eventType = parser.next();
                 }
+                */
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e("HomeFra_transportapi_", "Error: " + e.getMessage());
