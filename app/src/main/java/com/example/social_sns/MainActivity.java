@@ -20,10 +20,15 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,10 +44,15 @@ public class MainActivity extends AppCompatActivity {
 
         lineChart = (LineChart)findViewById(R.id.chart);
 
+        /*
         //공공데이터 전기 판매량 api 불러오기
         PowersellApi powersellApi = new PowersellApi();
         powersellApi.execute("", "", "");
 
+
+         */
+        RydeApi RydeApi = new RydeApi();
+        RydeApi.execute("", "", "");
         //딜레이는 공공데이터 api의 응답속도가 10초~15초 사이이기에 20초의 딜레이를 주고 그래프로 표현
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -91,6 +101,94 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public class RydeApi extends AsyncTask<String, String, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Log.d("Task3", "POST");
+            String temp = "Not Gained";
+            try {
+                temp = GET(strings[0]);
+                Log.d("REST", temp);
+                return temp;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return temp;
+        }
+
+        private String GET(String x) throws IOException {
+            String data2 = "";
+            String test_ip = "10.210.60.123";
+            String myUrl = String.format(test_ip, x);
+
+
+            Log.d("rydetest", "11111");
+            try {
+                URL url = new URL(test_ip);
+                Log.d("rydetest", "The response is :" + url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(10000);
+                conn.setConnectTimeout(15000);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+                conn.connect();
+
+
+                int response = conn.getResponseCode();
+                Log.d("rydetest1", "The response is :" + response);
+                InputStream inputStream;
+                inputStream = conn.getInputStream();
+                JsonObject json = new JsonParser().parse(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).getAsJsonObject();
+
+
+                Log.d("rydetest3", "The response is :" + json.getAsJsonArray("scoots").size());
+
+
+                for (int i = 1; i < json.getAsJsonArray("scoots").size(); i++) {
+                    String pin_code = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonPrimitive("pin_code").toString().replace("\"", "");
+                    String current_battery = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonPrimitive("current_battery").toString().replace("\"", "");
+                    String _latitude = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonObject("current_location").getAsJsonPrimitive("_latitude").toString();
+                    String _longitude = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonObject("current_location").getAsJsonPrimitive("_longitude").toString();
+
+
+                    Log.d("rydetest3", "The response is :" + pin_code + "|" + current_battery + "|" + _latitude + "|" + _longitude);
+                    int index_x;
+                    int index_y;
+
+                    index_x = (int) ((Double.parseDouble(_latitude) - 37.41) * 100);
+                    index_y = (int) ((Double.parseDouble(_longitude) - 126.73) * 100);
+                    if (index_x > 30) index_x = 30;
+                    if (index_x <= 0) index_x = 0;
+                    if (index_y > 54) index_y = 54;
+                    if (index_y <= 0) index_y = 0;
+
+                    Log.d("rydetest3", "The response is :" + index_x + "|" + index_y);
+                    int index_z = 0;
+
+
+
+                }
+            } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+
+            return data2;
+        }
     }
 
 
@@ -250,5 +348,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
 
 }
