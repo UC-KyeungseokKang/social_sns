@@ -18,12 +18,20 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,6 +39,8 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     private LineChart lineChart;
+    private LineDataSet lineDataSet = null;
+    private LineData lineData;
     static List<Entry> entries = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +49,55 @@ public class MainActivity extends AppCompatActivity {
 
         lineChart = (LineChart)findViewById(R.id.chart);
 
+        if(entries.size()!=0) {
+            lineDataSet = new LineDataSet(entries, "속성명1");
+            lineDataSet.setLineWidth(2);
+            lineDataSet.setCircleRadius(6);
+            lineDataSet.setCircleColor(Color.parseColor("#FFA1B4DC"));
+            lineDataSet.setCircleColorHole(Color.BLACK);
+            lineDataSet.setColor(Color.parseColor("#FFA1B4DC"));
+            lineDataSet.setDrawCircleHole(true);
+            lineDataSet.setDrawCircles(true);
+            lineDataSet.setDrawHorizontalHighlightIndicator(false);
+            lineDataSet.setDrawHighlightIndicators(false);
+            lineDataSet.setDrawValues(false);
+
+            lineData = new LineData(lineDataSet);
+        }
+        else
+        {
+            lineData = new LineData();
+        }
+        lineChart.setData(lineData);
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextColor(Color.BLACK);
+        xAxis.enableGridDashedLine(24, 24, 0);
+        YAxis yLAxis = lineChart.getAxisLeft();
+        yLAxis.setTextColor(Color.BLACK);
+        YAxis yRAxis = lineChart.getAxisRight();
+        yRAxis.setDrawLabels(false);
+        yRAxis.setDrawAxisLine(false);
+        yRAxis.setDrawGridLines(false);
+        Description description = new Description();
+        description.setText("");
+        lineChart.setDoubleTapToZoomEnabled(false);
+        lineChart.setDrawGridBackground(false);
+        lineChart.setDescription(description);
+        lineChart.animateY(2000, Easing.EasingOption.EaseInCubic);
+        lineChart.invalidate();
+        Log.d("error","Why Error");
+        /*
         //공공데이터 전기 판매량 api 불러오기
         PowersellApi powersellApi = new PowersellApi();
         powersellApi.execute("", "", "");
 
+
+         */
+        RydeApi RydeApi = new RydeApi();
+        RydeApi.execute("", "", "");
         //딜레이는 공공데이터 api의 응답속도가 10초~15초 사이이기에 20초의 딜레이를 주고 그래프로 표현
-        Handler handler = new Handler();
+        /*Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -88,9 +141,163 @@ public class MainActivity extends AppCompatActivity {
                 lineChart.invalidate();
             }
         }, 3000);
+*/
+
+
+    }
+
+    public class RydeApi extends AsyncTask<String, String, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Log.d("Task3", "POST");
+            String temp = "Not Gained";
+            try {
+                temp = GET(strings[0]);
+                Log.d("REST", temp);
+                return temp;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return temp;
+        }
+
+        private String GET(String x) throws IOException {
+            String data2 = "";
+            String test_ip = "http://10.210.32.99";
+            String myUrl = String.format(test_ip, x);
+
+
+            Log.d("rydetest", "11111");
+            try {
+                URL url = new URL(test_ip);
+                Log.d("rydetest", "The response is :" + url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setReadTimeout(70000);
+                conn.setConnectTimeout(70000);
+                conn.setRequestMethod("GET");
+                conn.setDoInput(true);
+                conn.connect();
+
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                String line;
+                StringBuilder sb = new StringBuilder();
+
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+
+                reader.close();
+                String resultJson = sb.toString();
+
+                Log.d("Respone",resultJson);
+                //int response = conn.getResponseCode();
+                //Log.d("rydetest1", "The response is :" + response);
+                //InputStream inputStream;
+                //inputStream = conn.getInputStream();
+                //JsonObject json = new JsonParser().parse(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).getAsJsonObject();
+
+                try{
+                    //JSONObject jsonObject = new JSONObject(resultJson);
+                    JSONArray js = new JSONArray(resultJson);
+                    entries.clear();
+
+                    for(int i=0;i<js.length();i++)
+                    {
+                        Log.d("Values",js.getString(i));
+
+                        //temp_pwrQty=i+0.1;
+                        //        double random=Math.random()*10;
+                        //      entries.add(new Entry(i+0.1f, (float) (random+0.1f)));
+                        entries.add(new Entry((float)(i+1),Float.valueOf(js.getString(i))));
+                        //lineChart.invalidate();
+
+
+                    }
+
+                    if(entries.size()!=0) {
+                        lineDataSet = new LineDataSet(entries, "속성명1");
+                        lineDataSet.setLineWidth(2);
+                        lineDataSet.setCircleRadius(6);
+                        lineDataSet.setCircleColor(Color.parseColor("#FFA1B4DC"));
+                        lineDataSet.setCircleColorHole(Color.BLACK);
+                        lineDataSet.setColor(Color.parseColor("#FFA1B4DC"));
+                        lineDataSet.setDrawCircleHole(true);
+                        lineDataSet.setDrawCircles(true);
+                        lineDataSet.setDrawHorizontalHighlightIndicator(false);
+                        lineDataSet.setDrawHighlightIndicators(false);
+                        lineDataSet.setDrawValues(false);
+
+                        lineData = new LineData(lineDataSet);
+                    }
+                    else
+                    {
+                        lineData = new LineData();
+                    }
+                    lineChart.setData(lineData);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            lineDataSet.notifyDataSetChanged();
+                            lineData.notifyDataChanged();
+                            lineChart.notifyDataSetChanged();
+                            lineChart.invalidate();
+                        }
+                    });
+
+                    //Log.d("Respone",resultJson);
+                }catch(JSONException e){
+                    Log.d("Error","error");
+                }
+
+                /*Log.d("rydetest3", "The response is :" + json.getAsJsonArray("scoots").size());
+
+
+                for (int i = 1; i < json.getAsJsonArray("scoots").size(); i++) {
+                    String pin_code = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonPrimitive("pin_code").toString().replace("\"", "");
+                    String current_battery = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonPrimitive("current_battery").toString().replace("\"", "");
+                    String _latitude = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonObject("current_location").getAsJsonPrimitive("_latitude").toString();
+                    String _longitude = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonObject("current_location").getAsJsonPrimitive("_longitude").toString();
+
+
+                    Log.d("rydetest3", "The response is :" + pin_code + "|" + current_battery + "|" + _latitude + "|" + _longitude);
+                    int index_x;
+                    int index_y;
+
+                    index_x = (int) ((Double.parseDouble(_latitude) - 37.41) * 100);
+                    index_y = (int) ((Double.parseDouble(_longitude) - 126.73) * 100);
+                    if (index_x > 30) index_x = 30;
+                    if (index_x <= 0) index_x = 0;
+                    if (index_y > 54) index_y = 54;
+                    if (index_y <= 0) index_y = 0;
+
+                    Log.d("rydetest3", "The response is :" + index_x + "|" + index_y);
+                    int index_z = 0;
 
 
 
+                }
+                */
+            } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+
+            return data2;
+        }
     }
 
 
@@ -250,5 +457,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
 
 }
