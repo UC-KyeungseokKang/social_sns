@@ -2,11 +2,9 @@ package com.example.social_sns;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -20,11 +18,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,10 +27,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -88,66 +81,16 @@ public class MainActivity extends AppCompatActivity {
         lineChart.animateY(2000, Easing.EasingOption.EaseInCubic);
         lineChart.invalidate();
         Log.d("error","Why Error");
-        /*
-        //공공데이터 전기 판매량 api 불러오기
-        PowersellApi powersellApi = new PowersellApi();
-        powersellApi.execute("", "", "");
 
-
-         */
-        RydeApi RydeApi = new RydeApi();
-        RydeApi.execute("", "", "");
+        model_control_api model_control_api = new model_control_api();
+        model_control_api.execute("", "", "");
         //딜레이는 공공데이터 api의 응답속도가 10초~15초 사이이기에 20초의 딜레이를 주고 그래프로 표현
-        /*Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
 
-                //entries.add(new Entry(1, 1));
-                for(int i=0;i<24;i++){
-                    //temp_pwrQty=i+0.1;
-                    double random=Math.random()*10;
-                    entries.add(new Entry(i+0.1f, (float) (random+0.1f)));
-
-                }
-                LineDataSet lineDataSet = new LineDataSet(entries, "속성명1");
-                lineDataSet.setLineWidth(2);
-                lineDataSet.setCircleRadius(6);
-                lineDataSet.setCircleColor(Color.parseColor("#FFA1B4DC"));
-                lineDataSet.setCircleColorHole(Color.BLACK);
-                lineDataSet.setColor(Color.parseColor("#FFA1B4DC"));
-                lineDataSet.setDrawCircleHole(true);
-                lineDataSet.setDrawCircles(true);
-                lineDataSet.setDrawHorizontalHighlightIndicator(false);
-                lineDataSet.setDrawHighlightIndicators(false);
-                lineDataSet.setDrawValues(false);
-                LineData lineData = new LineData(lineDataSet);
-                lineChart.setData(lineData);
-                XAxis xAxis = lineChart.getXAxis();
-                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                xAxis.setTextColor(Color.BLACK);
-                xAxis.enableGridDashedLine(24, 24, 0);
-                YAxis yLAxis = lineChart.getAxisLeft();
-                yLAxis.setTextColor(Color.BLACK);
-                YAxis yRAxis = lineChart.getAxisRight();
-                yRAxis.setDrawLabels(false);
-                yRAxis.setDrawAxisLine(false);
-                yRAxis.setDrawGridLines(false);
-                Description description = new Description();
-                description.setText("");
-                lineChart.setDoubleTapToZoomEnabled(false);
-                lineChart.setDrawGridBackground(false);
-                lineChart.setDescription(description);
-                lineChart.animateY(2000, Easing.EasingOption.EaseInCubic);
-                lineChart.invalidate();
-            }
-        }, 3000);
-*/
 
 
     }
 
-    public class RydeApi extends AsyncTask<String, String, String> {
+    public class model_control_api extends AsyncTask<String, String, String> {
 
 
         @Override
@@ -265,35 +208,6 @@ public class MainActivity extends AppCompatActivity {
                 }catch(JSONException e){
                     Log.d("Error","error");
                 }
-
-                /*Log.d("rydetest3", "The response is :" + json.getAsJsonArray("scoots").size());
-
-
-                for (int i = 1; i < json.getAsJsonArray("scoots").size(); i++) {
-                    String pin_code = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonPrimitive("pin_code").toString().replace("\"", "");
-                    String current_battery = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonPrimitive("current_battery").toString().replace("\"", "");
-                    String _latitude = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonObject("current_location").getAsJsonPrimitive("_latitude").toString();
-                    String _longitude = json.getAsJsonArray("scoots").get(i).getAsJsonObject().getAsJsonObject("current_location").getAsJsonPrimitive("_longitude").toString();
-
-
-                    Log.d("rydetest3", "The response is :" + pin_code + "|" + current_battery + "|" + _latitude + "|" + _longitude);
-                    int index_x;
-                    int index_y;
-
-                    index_x = (int) ((Double.parseDouble(_latitude) - 37.41) * 100);
-                    index_y = (int) ((Double.parseDouble(_longitude) - 126.73) * 100);
-                    if (index_x > 30) index_x = 30;
-                    if (index_x <= 0) index_x = 0;
-                    if (index_y > 54) index_y = 54;
-                    if (index_y <= 0) index_y = 0;
-
-                    Log.d("rydetest3", "The response is :" + index_x + "|" + index_y);
-                    int index_z = 0;
-
-
-
-                }
-                */
             } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
@@ -356,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
                     countlist++;
                 }
                 entries.add(new Entry(5+0.1f, 5+0.1f));
-                /*
+
                 while (eventType != XmlPullParser.END_DOCUMENT) {
                     //Log.d("findpath_parser", String.valueOf(eventType)+" name : "+parser.getName()+" text : "+parser.getText());
                     switch (eventType) {
@@ -443,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     eventType = parser.next();
                 }
-                */
+
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.e("HomeFra_transportapi_", "Error: " + e.getMessage());
