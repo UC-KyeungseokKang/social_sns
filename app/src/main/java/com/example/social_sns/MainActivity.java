@@ -23,7 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -249,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                         lineData = new LineData();
                     }
                     lineChart.setData(lineData);
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
